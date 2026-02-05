@@ -1,1 +1,0 @@
-# core2-INT-26spring
