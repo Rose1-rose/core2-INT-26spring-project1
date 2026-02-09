@@ -1,0 +1,90 @@
+:root {
+  /* Color system */
+  --bg-paper: #f6f0df;        /* White Chocolate */
+  --ink-primary: #0b0a4a;     /* Dark Blue */
+  --ink-secondary: #67637f;   /* Desaturated blue-gray */
+  --accent-orange: #ff6433;  /* Portland Orange */
+  --system-green: #b9d44c;   /* June Bud */
+
+  --shadow-soft: rgba(0, 0, 0, 0.12);
+}
+
+/* reset */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  background: white;
+  color: var(--ink-primary);
+}
+
+/* ===== Fragment Field ===== */
+
+.stage {
+  position: relative;
+  margin: 40px auto;
+  width: min(1100px, calc(100vw - 80px));
+  height: min(680px, calc(100vh - 120px));
+
+  background: var(--bg-paper);
+  overflow: hidden;
+
+  /* subtle system boundary */
+  box-shadow: inset 0 0 0 1px var(--system-green);
+}
+
+/* ===== Fragment (sentence, not button) ===== */
+
+.fragment {
+  position: absolute;
+  max-width: 260px; /* forces sentence wrapping */
+
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 16px;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+
+  color: var(--bg-paper);
+  background: var(--ink-secondary);
+
+  padding: 12px 14px;
+  border-radius: 2px;
+
+  text-decoration: none;
+
+  box-shadow: 0 8px 14px var(--shadow-soft);
+
+  transform: translate(-50%, -50%);
+}
+
+/* hierarchy via size only (not importance) */
+.fragment[data-size="lg"] {
+  font-size: 20px;
+  max-width: 320px;
+}
+
+.fragment[data-size="md"] {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.fragment[data-size="sm"] {
+  font-size: 13px;
+  opacity: 0.8;
+  max-width: 200px;
+}
+
+/* ===== Interaction ===== */
+/* Orange appears ONLY on interaction */
+
+.fragment:hover {
+  background: var(--accent-orange);
+  color: white;
+}
+
+.fragment:active {
+  transform: translate(-50%, -50%) scale(0.97);
+}
