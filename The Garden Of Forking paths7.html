@@ -14,19 +14,19 @@
   </header>
 
   <main class="page">
-    <P>
+    <P class="puzzle">
         in the last stage of a desperate adventure, on a Western island. I remember the 
 final words, repeated at the end of each version like a secret command: "Thus the 
 heroes fought, with tranquil heart and bloody sword. They were resigned to killing 
 and to dying." 
     </P>
-    <P>
+    <P class="puzzle">
         At that moment I felt within me and around me something invisible and intangible 
 pullulating. It was not the pullulation of two divergent, parallel, and finally converging 
 armies, but an agitation more inaccessible, more intimate, prefigured by them in 
 some way. Stephen Albert continued: 
     </P>
-    <P>
+    <P class="puzzle">
         "I do not think that your illustrious ancestor toyed idly with variations. I do not find 
 it believable that he would waste thirteen years laboring over a never ending 
 experiment in rhetoric. In your country the novel is an inferior genre; in Ts'ui Pen's 
@@ -40,15 +40,15 @@ is the only problem that does not figure in the pages of The Garden. He does not
 even use the word which means time. How can these voluntary omissions be 
 explained?" 
     </P>
-    <P>
+    <P class="puzzle">
         I proposed various solutions, all of them inadequate. We discussed them. Finally 
 Stephen Albert said: "In a guessing game to which the answer is chess, which word is 
 the only one prohibited?" I thought for a moment and then replied: 
     </P>
-    <P>
+    <P class="puzzle">
         "The word is chess." 
     </P>
-    <P>
+    <P class="puzzle">
         "Precisely," said Albert. "The Garden of Forking Paths is an enormous guessing game, 
 or parable, in which the subject is time. The rules of the game forbid the use of the 
 word itself. To eliminate a word completely, to refer to it by means of inept phrases 
@@ -60,7 +60,7 @@ from this chaos, I have restored, or believe I have restored, the original. I ha
 translated the whole work. I can state categorically that not once has the word time 
 been used in the whole book. 
     </P>
-    <P>
+    <P class="puzzle">
         "The explanation is obvious. The Garden of Forking Paths is a picture, incomplete 
 yet not false, of the universe such as Ts'ui Pen conceived it to be. Differing from 
 Newton and Schopenhauer, your ancestor did not think of time as absolute and 
@@ -74,5 +74,89 @@ another, you, crossing the garden, have found me dead. In yet another, I say the
 very same words, but am an error, a phantom." 
     </P>
      </main>
+</body>
+</html>
+<!-- JS 放在 body 最底部 -->
+  <script>
+    /**
+     * 把<p class="puzzle">里的纯文本切成“碎片span”
+     * 你可以调 chunkSize 来控制每片的长度（越小越碎，越像拼图）
+     */
+    const chunkSize = 26; // 每片大概多少字符（建议 18-32）
+
+    function splitIntoChunks(text, size) {
+      const clean = text.replace(/\s+/g, ' ').trim();
+      const chunks = [];
+      let i = 0;
+
+      while (i < clean.length) {
+        // 尽量在空格处断开，不要硬切断单词
+        let end = Math.min(i + size, clean.length);
+        if (end < clean.length) {
+          const lastSpace = clean.lastIndexOf(' ', end);
+          if (lastSpace > i + 8) end = lastSpace; // 8 是防止切得太短
+        }
+        chunks.push(clean.slice(i, end));
+        i = end + 1;
+      }
+      return chunks;
+    }
+
+    function randomFromSides() {
+      // 0上 1右 2下 3左
+      const side = Math.floor(Math.random() * 4);
+      const dist = 140 + Math.random() * 220;
+      let dx = 0, dy = 0;
+
+      if (side === 0) { dy = -dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 1) { dx =  dist; dy = (Math.random() - 0.5) * dist; }
+      if (side === 2) { dy =  dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 3) { dx = -dist; dy = (Math.random() - 0.5) * dist; }
+
+      return { dx, dy };
+    }
+
+    function buildPuzzleParagraph(p) {
+      const original = p.textContent;
+      const parts = splitIntoChunks(original, chunkSize);
+
+      p.textContent = ''; // 清空
+      p.classList.add('puzzle-ready');
+
+      parts.forEach((part, i) => {
+        const span = document.createElement('span');
+        span.className = 'piece';
+        span.textContent = part + ' '; // 保留空格
+
+        const { dx, dy } = randomFromSides();
+        const rot = (Math.random() - 0.5) * 18; // -9deg ~ 9deg
+        const delay = i * 55 + Math.random() * 60; // 拼图节奏
+
+        span.style.setProperty('--dx', dx.toFixed(0) + 'px');
+        span.style.setProperty('--dy', dy.toFixed(0) + 'px');
+        span.style.setProperty('--rot', rot.toFixed(1) + 'deg');
+        span.style.setProperty('--delay', delay.toFixed(0) + 'ms');
+
+        p.appendChild(span);
+      });
+    }
+
+    // 1) 先把所有 puzzle 段落构造成碎片
+    const puzzles = document.querySelectorAll('p.puzzle');
+    puzzles.forEach(buildPuzzleParagraph);
+
+    // 2) 滚动到时触发一次拼合
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.25 });
+
+    puzzles.forEach(p => io.observe(p));
+  </script>
+
 </body>
 </html>

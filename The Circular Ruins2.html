@@ -14,14 +14,98 @@
   </header>
 
   <main class="page">
-     <p>
+     <p class="puzzle">
      but that he could expect something from those who occasionally dared to oppose him. The former group, although worthy of love and affection, could not ascend to the level of individuals; the latter pre-existed to a slightly greater degree. One afternoon (now afternoons were also given over to sleep, now he was only awake for a couple hours at daybreak) he dismissed the vast illusory student body for good and kept only one pupil. He was a taciturn, sallow boy, at times intractable, and whose sharp features resembled of those of his dreamer. The brusque elimination of his fellow students did not disconcert him for long; after a few private lessons, his progress was enough to astound the teacher. Nevertheless, a catastrophe took place. One day, the man emerged from his sleep as if from a viscous desert, looked at the useless afternoon light which he immediately confused with the dawn, and understood that he had not dreamed. All that night and all day long, the intolerable lucidity of insomnia fell upon him. He tried exploring the forest, to lose his strength; among the hemlock he barely succeeded in experiencing several short snatchs of sleep, veined with fleeting, rudimentary visions that were useless. He tried to assemble the student body but scarcely had he articulated a few brief words of exhortation when it became deformed and was then erased. In his almost perpetual vigil, tears of anger burned his old eyes.
- <p>
+ <p class="puzzle">
      He understood that modeling the incoherent and vertiginous matter of which dreams are composed was the most difficult task that a man could undertake, even though he should penetrate all the enigmas of a superior and inferior order; much more difficult than weaving a rope out of sand or coining the faceless wind. He swore he would forget the enormous hallucination which had thrown him off at first, and he sought another method of work. Before putting it into execution, he spent a month recovering his strength, which had been squandered by his delirium. He abandoned all premeditation of dreaming and almost immediately succeeded in sleeping a reasonable part of each day. The few times that he had dreams during this period, he paid no attention to them. Before resuming his task, he waited until the moon's disk was perfect. Then, in the afternoon, he purified himself in the waters of the river, worshiped the planetary gods, pronounced the prescribed syllables of a mighty name, and went to sleep. He dreamed almost immediately, with his heart throbbing.
-  </p>
-  <p>
+  </p >
+  <p class="puzzle">
      He dreamed that it was warm, secret, about the size of a clenched fist, and of a garnet color within the penumbra of a human body as yet without face or sex; during fourteen lucid nights he dreampt of it with meticulous love. Every night he perceived it more clearly. He did not touch it; he only permitted himself to witness it, to observe it, and occasionally to rectify it with a glance. He perceived it and lived it from all angles and distances. On the fourteenth night he lightly touched the pulmonary artery with his index finger, then the whole heart, outside and inside. He was satisfied with the examination. He deliberately did not dream for a night; he took up the heart again, invoked the name of a planet, and undertook the vision of another of the principle organs. Within a year he had come to the skeleton and the eyelids. The innumerable hair was perhaps the most difficult task. He dreamed an entire man--a young man, but who did not sit up or talk, who was unable to open his eyes. Night after night, the man dreamt him asleep.
    </p>
     </main>
+</body>
+</html>
+<!-- JS 放在 body 最底部 -->
+  <script>
+    /**
+     * 把<p class="puzzle">里的纯文本切成“碎片span”
+     * 你可以调 chunkSize 来控制每片的长度（越小越碎，越像拼图）
+     */
+    const chunkSize = 26; // 每片大概多少字符（建议 18-32）
+
+    function splitIntoChunks(text, size) {
+      const clean = text.replace(/\s+/g, ' ').trim();
+      const chunks = [];
+      let i = 0;
+
+      while (i < clean.length) {
+        // 尽量在空格处断开，不要硬切断单词
+        let end = Math.min(i + size, clean.length);
+        if (end < clean.length) {
+          const lastSpace = clean.lastIndexOf(' ', end);
+          if (lastSpace > i + 8) end = lastSpace; // 8 是防止切得太短
+        }
+        chunks.push(clean.slice(i, end));
+        i = end + 1;
+      }
+      return chunks;
+    }
+
+    function randomFromSides() {
+      // 0上 1右 2下 3左
+      const side = Math.floor(Math.random() * 4);
+      const dist = 140 + Math.random() * 220;
+      let dx = 0, dy = 0;
+
+      if (side === 0) { dy = -dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 1) { dx =  dist; dy = (Math.random() - 0.5) * dist; }
+      if (side === 2) { dy =  dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 3) { dx = -dist; dy = (Math.random() - 0.5) * dist; }
+
+      return { dx, dy };
+    }
+
+    function buildPuzzleParagraph(p) {
+      const original = p.textContent;
+      const parts = splitIntoChunks(original, chunkSize);
+
+      p.textContent = ''; // 清空
+      p.classList.add('puzzle-ready');
+
+      parts.forEach((part, i) => {
+        const span = document.createElement('span');
+        span.className = 'piece';
+        span.textContent = part + ' '; // 保留空格
+
+        const { dx, dy } = randomFromSides();
+        const rot = (Math.random() - 0.5) * 18; // -9deg ~ 9deg
+        const delay = i * 55 + Math.random() * 60; // 拼图节奏
+
+        span.style.setProperty('--dx', dx.toFixed(0) + 'px');
+        span.style.setProperty('--dy', dy.toFixed(0) + 'px');
+        span.style.setProperty('--rot', rot.toFixed(1) + 'deg');
+        span.style.setProperty('--delay', delay.toFixed(0) + 'ms');
+
+        p.appendChild(span);
+      });
+    }
+
+    // 1) 先把所有 puzzle 段落构造成碎片
+    const puzzles = document.querySelectorAll('p.puzzle');
+    puzzles.forEach(buildPuzzleParagraph);
+
+    // 2) 滚动到时触发一次拼合
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.25 });
+
+    puzzles.forEach(p => io.observe(p));
+  </script>
+
 </body>
 </html>

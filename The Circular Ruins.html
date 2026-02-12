@@ -14,15 +14,100 @@
   </header>
 
   <main class="page">
-     <p>
+     <p class="puzzle">
      no one saw the bamboo canoe sink into the sacred mud, but in a few days there was no one who did not know that the taciturn man came from the South and that his home had been one of those numberless villages upstream in the deeply cleft side of the mountain, where the Zend language has not been contaminated by Greek and where leprosy is infrequent. What is certain is that the grey man kissed the mud, climbed up the bank with pushing aside (probably, without feeling) the blades which were lacerating his flesh, and crawled, nauseated and bloodstained, up to the circular enclosure crowned with a stone tiger or horse, which sometimes was the color of flame and now was that of ashes. This circle was a temple which had been devoured by ancient fires, profaned by the miasmal jungle, and whose god no longer received the homage of men. The stranger stretched himself out beneath the pedestal. He was awakened by the sun high overhead. He was not astonished to find that his wounds had healed; he closed his pallid eyes and slept, not through weakness of flesh but through determination of will. He knew that this temple was the place required for his invincible intent; he knew that the incessant trees had not succeeded in strangling the ruins of another propitious temple downstream which had once belonged to gods now burned and dead; he knew that his immediate obligation was to dream. Toward midnight he was awakened by the inconsolable shriek of a bird. Tracks of bare feet, some figs and a jug warned him that the men of the region had been spying respectfully on his sleep, soliciting his protection or afraid of his magic. He felt a chill of fear, and sought out a sepulchral niche in the dilapidated wall where he concealed himself among unfamiliar leaves.
  </p>
- <p>
+ <p class="puzzle">
      The purpose which guided him was not impossible, though supernatural. He wanted to dream a man; he wanted to dream him in minute entirety and impose him on reality. This magic project had exhausted the entire expanse of his mind; if someone had asked him his name or to relate some event of his former life, he would not have been able to give an answer. This uninhabited, ruined temple suited him, for it is contained a minimum of visible world; the proximity of the workmen also suited him, for they took it upon themselves to provide for his frugal needs. The rice and fruit they brought him were nourishment enough for his body, which was consecrated to the sole task of sleeping and dreaming.
   </p>
-  <p>
+  <p class="puzzle">
      At first, his dreams were chaotic; then in a short while they became dialectic in nature. The stranger dreamed that he was in the center of a circular amphitheater which was more or less the burnt temple; clouds of taciturn students filled the tiers of seats; the faces of the farthest ones hung at a distance of many centuries and as high as the stars, but their features were completely precise. The man lectured his pupils on anatomy, cosmography, and magic: the faces listened anxiously and tried to answer understandingly, as if they guessed the importance of that examination which would redeem one of them from his condition of empty illusion and interpolate him into the real world. Asleep or awake, the man thought over the answers of his phantoms, did not allow himself to be deceived by imposters, and in certain perplexities he sensed a growing intelligence. He was seeking a soul worthy of participating in the universe.
     </p>
   </main>
 </body>
 </html>
+<!-- JS 放在 body 最底部 -->
+  <script>
+    /**
+     * 把<p class="puzzle">里的纯文本切成“碎片span”
+     * 你可以调 chunkSize 来控制每片的长度（越小越碎，越像拼图）
+     */
+    const chunkSize = 26; // 每片大概多少字符（建议 18-32）
+
+    function splitIntoChunks(text, size) {
+      const clean = text.replace(/\s+/g, ' ').trim();
+      const chunks = [];
+      let i = 0;
+
+      while (i < clean.length) {
+        // 尽量在空格处断开，不要硬切断单词
+        let end = Math.min(i + size, clean.length);
+        if (end < clean.length) {
+          const lastSpace = clean.lastIndexOf(' ', end);
+          if (lastSpace > i + 8) end = lastSpace; // 8 是防止切得太短
+        }
+        chunks.push(clean.slice(i, end));
+        i = end + 1;
+      }
+      return chunks;
+    }
+
+    function randomFromSides() {
+      // 0上 1右 2下 3左
+      const side = Math.floor(Math.random() * 4);
+      const dist = 140 + Math.random() * 220;
+      let dx = 0, dy = 0;
+
+      if (side === 0) { dy = -dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 1) { dx =  dist; dy = (Math.random() - 0.5) * dist; }
+      if (side === 2) { dy =  dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 3) { dx = -dist; dy = (Math.random() - 0.5) * dist; }
+
+      return { dx, dy };
+    }
+
+    function buildPuzzleParagraph(p) {
+      const original = p.textContent;
+      const parts = splitIntoChunks(original, chunkSize);
+
+      p.textContent = ''; // 清空
+      p.classList.add('puzzle-ready');
+
+      parts.forEach((part, i) => {
+        const span = document.createElement('span');
+        span.className = 'piece';
+        span.textContent = part + ' '; // 保留空格
+
+        const { dx, dy } = randomFromSides();
+        const rot = (Math.random() - 0.5) * 18; // -9deg ~ 9deg
+        const delay = i * 55 + Math.random() * 60; // 拼图节奏
+
+        span.style.setProperty('--dx', dx.toFixed(0) + 'px');
+        span.style.setProperty('--dy', dy.toFixed(0) + 'px');
+        span.style.setProperty('--rot', rot.toFixed(1) + 'deg');
+        span.style.setProperty('--delay', delay.toFixed(0) + 'ms');
+
+        p.appendChild(span);
+      });
+    }
+
+    // 1) 先把所有 puzzle 段落构造成碎片
+    const puzzles = document.querySelectorAll('p.puzzle');
+    puzzles.forEach(buildPuzzleParagraph);
+
+    // 2) 滚动到时触发一次拼合
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.25 });
+
+    puzzles.forEach(p => io.observe(p));
+  </script>
+
+</body>
+</html>
+

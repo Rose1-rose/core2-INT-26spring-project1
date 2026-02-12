@@ -14,17 +14,17 @@
   </header>
 
   <main class="page">
-     <p>
+     <p class="puzzle">
     through meadows misty in the twilight. 
 A high-pitched and almost syllabic music kept coming and going, moving with the 
 breeze, blurred by the leaves and by distance. 
      </p>
- <p>
+ <p class="puzzle">
     I thought that a man might be an enemy of other men, of the differing moments of 
 other men, but never an enemy of a country: not of fireflies, words, gardens, 
 streams, or the West wind. 
      </p>
-    <p>
+    <p class="puzzle">
       Meditating thus I arrived at a high, rusty iron gate. Through the railings I could see an 
 avenue bordered with poplar trees and also a kind of summer house or pavilion. 
 Two things dawned on me at once, the first trivial and the second almost incredible: 
@@ -33,40 +33,40 @@ accepted it fully, without paying it any attention. I do not remember whether th
 was a bell, a push-button, or whether I attracted attention by clapping my hands. The 
 stuttering sparks of the music kept on. 
     </p>
-    <p>
+    <p class="puzzle">
 But from the end of the avenue, from the main house, a lantern approached; a 
 lantern which alternately, from moment to moment, was crisscrossed or put out by 
 the trunks of the trees; a paper lantern shaped like a drum and colored like the 
 moon. A tall man carried it. I could not see his face for the light blinded me.
     </p>
-    <p>
+    <p class="puzzle">
        He opened the gate and spoke slowly in my language. 
     </p>
-    <P>
+    <P class="puzzle">
        "I see that the worthy Hsi P'eng has troubled himself to see to relieving my solitude. 
 No doubt you want to see the garden?" 
     </P>
-    <p>
+    <p class="puzzle">
 Recognizing the name of one of our consuls, I replied, somewhat taken aback. 
 </p>
-<p>
+<p class="puzzle">
 "The garden?" 
 </p>
-<P>
+<P class="puzzle">
   "The garden of forking paths."   
 </P>
-<P>
+<P class="puzzle">
 Something stirred in my memory and I said, with incomprehensible assurance: 
 </P>
-<P>
+<P class="puzzle">
  "The garden of my ancestor, Ts'ui Pen."    
 </P>
-<P>
+<P class="puzzle">
  "Your ancestor? Your illustrious ancestor? Come in."    
 </P>
 
 
-<P>
+<P class="puzzle">
 The damp path zigzagged like those of my childhood. When we reached the house, 
 we went into a library filled with books from both East and West. I recognized some 
 large volumes bound in yellow silk-manuscripts of the Lost Encyclopedia which was 
@@ -75,11 +75,95 @@ printed. A phonograph record was spinning near a bronze phoenix. I remember also
 a rose-glazed jar and yet another, older by many centuries, of that blue color which 
 our potters copied from the Persians . . .   
 </P>
-<P>
+<P class="puzzle">
     Stephen Albert was watching me with a smile on his face. He was, as I have said, 
 remarkably tall. His face was deeply lined and he had gray eyes and a gray beard. 
 There was about him something of the priest, and something of the sailor. Later, he 
 </P>
     </main>
+</body>
+</html>
+<!-- JS 放在 body 最底部 -->
+  <script>
+    /**
+     * 把<p class="puzzle">里的纯文本切成“碎片span”
+     * 你可以调 chunkSize 来控制每片的长度（越小越碎，越像拼图）
+     */
+    const chunkSize = 26; // 每片大概多少字符（建议 18-32）
+
+    function splitIntoChunks(text, size) {
+      const clean = text.replace(/\s+/g, ' ').trim();
+      const chunks = [];
+      let i = 0;
+
+      while (i < clean.length) {
+        // 尽量在空格处断开，不要硬切断单词
+        let end = Math.min(i + size, clean.length);
+        if (end < clean.length) {
+          const lastSpace = clean.lastIndexOf(' ', end);
+          if (lastSpace > i + 8) end = lastSpace; // 8 是防止切得太短
+        }
+        chunks.push(clean.slice(i, end));
+        i = end + 1;
+      }
+      return chunks;
+    }
+
+    function randomFromSides() {
+      // 0上 1右 2下 3左
+      const side = Math.floor(Math.random() * 4);
+      const dist = 140 + Math.random() * 220;
+      let dx = 0, dy = 0;
+
+      if (side === 0) { dy = -dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 1) { dx =  dist; dy = (Math.random() - 0.5) * dist; }
+      if (side === 2) { dy =  dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 3) { dx = -dist; dy = (Math.random() - 0.5) * dist; }
+
+      return { dx, dy };
+    }
+
+    function buildPuzzleParagraph(p) {
+      const original = p.textContent;
+      const parts = splitIntoChunks(original, chunkSize);
+
+      p.textContent = ''; // 清空
+      p.classList.add('puzzle-ready');
+
+      parts.forEach((part, i) => {
+        const span = document.createElement('span');
+        span.className = 'piece';
+        span.textContent = part + ' '; // 保留空格
+
+        const { dx, dy } = randomFromSides();
+        const rot = (Math.random() - 0.5) * 18; // -9deg ~ 9deg
+        const delay = i * 55 + Math.random() * 60; // 拼图节奏
+
+        span.style.setProperty('--dx', dx.toFixed(0) + 'px');
+        span.style.setProperty('--dy', dy.toFixed(0) + 'px');
+        span.style.setProperty('--rot', rot.toFixed(1) + 'deg');
+        span.style.setProperty('--delay', delay.toFixed(0) + 'ms');
+
+        p.appendChild(span);
+      });
+    }
+
+    // 1) 先把所有 puzzle 段落构造成碎片
+    const puzzles = document.querySelectorAll('p.puzzle');
+    puzzles.forEach(buildPuzzleParagraph);
+
+    // 2) 滚动到时触发一次拼合
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.25 });
+
+    puzzles.forEach(p => io.observe(p));
+  </script>
+
 </body>
 </html>

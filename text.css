@@ -121,3 +121,64 @@ mask-image: linear-gradient(
     transparent 100%
   );
 }
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.bar {
+  padding: 18px 22px;
+}
+
+.back {
+  text-decoration: none;
+}
+
+.page {
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 42px 22px 120px;
+  line-height: 1.7;
+}
+
+
+.puzzle-ready {
+  margin: 0 0 22px;
+}
+
+
+.piece {
+  display: inline-block;
+  opacity: 0;
+  transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--rot, 0deg)) scale(0.985);
+  filter: blur(7px);
+  transition:
+    transform 900ms cubic-bezier(.2,.85,.2,1),
+    opacity 900ms cubic-bezier(.2,.85,.2,1),
+    filter 900ms cubic-bezier(.2,.85,.2,1);
+  transition-delay: var(--delay, 0ms);
+  will-change: transform, opacity, filter;
+}
+
+
+.puzzle.is-visible .piece {
+  opacity: 1;
+  transform: translate(0, 0) rotate(0deg) scale(1);
+  filter: blur(0);
+}
+
+
+.piece {
+  text-shadow: 0 0 0.01px rgba(0,0,0,0.2);
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .piece {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+}

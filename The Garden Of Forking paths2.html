@@ -14,7 +14,7 @@
   </header>
 
   <main class="page">
-     <p>
+     <p class="puzzle">
      I knew that the fast-moving and doubtless happy soldier did 
 not suspect that I possessed the Secret - the name of the exact site of the new 
 British artillery park on the Ancre. A bird streaked across the misty sky and, 
@@ -25,16 +25,15 @@ heard in Germany ... My voice, my human voice, was weak. How could it reach the
 ear of the Chief? The ear of that sick and hateful man who knew nothing of 
 Runeberg or of me except that we were in Staffordshire. A man who, sitting in his 
      </p>
-     <P>
+     <P class="puzzle">
 i
      </P>
 
-     </p>
- <p>
+ <p class="puzzle">
      arid Berlin office, leafed infinitely through newspapers, looking in vain for news from 
 us. I said aloud, "I must flee." 
      </p>
-    <p>
+    <p class="puzzle">
        I sat up on the bed, in senseless and perfect silence, as if Madden was already peering 
 at me. Something - perhaps merely a desire to prove my total penury to myself - 
 made me empty out my pockets. I found just what I knew I was going to find. The 
@@ -45,12 +44,12 @@ single shillings and some pennies, a red and blue pencil, a handkerchief - and a
 revolver with a single bullet. Absurdly I held it and weighed it in my hand, to give 
 myself courage. Vaguely I thought that a pistol shot can be heard for a great distance.  
     </p>
-    <p>
+    <p class="puzzle">
 In ten minutes I had developed my plan. The telephone directory gave me the name 
 of the one person capable of passing on the information. He lived in a suburb of 
 Fenton, less than half an hour away by train. 
     </p>
-    <p>
+    <p class="puzzle">
         I am a timorous man. I can say it now, now that I have brought my incredibly risky 
 plan to an end. It was not easy to bring about, and I know that its execution was 
 terrible. I did not do it for Germany - no! Such a barbarous country is of no 
@@ -59,13 +58,13 @@ Furthermore, I knew an Englishman - a modest man - who, for me, is as great as
 Goethe. I did not speak with him for more than an hour, but during that time, he 
 was Goethe. 
     </p>
-    <p>
+    <p class="puzzle">
         I carried out my plan because I felt the Chief had some fear of those of my race, of 
 those uncountable forebears whose culmination lies in me. I wished to prove to him 
 that a yellow man could save his armies. Besides, I had to escape the Captain. His 
 hands and voice could, at any moment, knock and beckon at my door.
     </p>
-    <P>
+    <P class="puzzle">
         Silently, I dressed, took leave of myself in the mirror, went down the stairs, sneaked 
 a look at the quiet street, and went out. The station was not far from my house, but 
 I thought it more prudent to take a cab. I told myself that I thus ran less chance of 
@@ -73,24 +72,108 @@ being recognized. The truth is that, in the deserted street, I felt infinitely v
 vulnerable. I recall that I told the driver to stop short of the main entrance. I got out 
 with a painful and deliberate slowness. 
     </P>
-    <P>
+    <P class="puzzle">
         I was going to the village of Ashgrove, but took a ticket for a station further on. The 
 train would leave in a few minutes, at eight-fifty. I hurried, for the next would not go 
 until half past nine. There was almost no one on the platform. I walked through the 
 carriages. I remember some farmers, a woman dressed in mourning, a youth deep in 
 Tacitus' Annals and a wounded, happy soldier. 
     </P>
-    <P>
+    <P class="puzzle">
         At last the train pulled out. A man I recognized ran furiously, but vainly, the length of 
 the platform. It was Captain Richard Madden. Shattered, trembling, I huddled in the 
 distant corner of the seat, as far as possible from the fearful window. 
     </P>
-    <P>
+    <P class="puzzle">
         From utter terror I passed into a state of almost abject happiness. I told myself that 
 the duel had already started and that I had won the first encounter by besting my 
 adversary in his first attack - even if it was only for forty minutes - by an accident of 
 fate. I argued that so small a victory prefigured a total victory. I argued that it was 
     </P>
     </main>
+</body>
+</html>
+<!-- JS 放在 body 最底部 -->
+  <script>
+    /**
+     * 把<p class="puzzle">里的纯文本切成“碎片span”
+     * 你可以调 chunkSize 来控制每片的长度（越小越碎，越像拼图）
+     */
+    const chunkSize = 26; // 每片大概多少字符（建议 18-32）
+
+    function splitIntoChunks(text, size) {
+      const clean = text.replace(/\s+/g, ' ').trim();
+      const chunks = [];
+      let i = 0;
+
+      while (i < clean.length) {
+        // 尽量在空格处断开，不要硬切断单词
+        let end = Math.min(i + size, clean.length);
+        if (end < clean.length) {
+          const lastSpace = clean.lastIndexOf(' ', end);
+          if (lastSpace > i + 8) end = lastSpace; // 8 是防止切得太短
+        }
+        chunks.push(clean.slice(i, end));
+        i = end + 1;
+      }
+      return chunks;
+    }
+
+    function randomFromSides() {
+      // 0上 1右 2下 3左
+      const side = Math.floor(Math.random() * 4);
+      const dist = 140 + Math.random() * 220;
+      let dx = 0, dy = 0;
+
+      if (side === 0) { dy = -dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 1) { dx =  dist; dy = (Math.random() - 0.5) * dist; }
+      if (side === 2) { dy =  dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 3) { dx = -dist; dy = (Math.random() - 0.5) * dist; }
+
+      return { dx, dy };
+    }
+
+    function buildPuzzleParagraph(p) {
+      const original = p.textContent;
+      const parts = splitIntoChunks(original, chunkSize);
+
+      p.textContent = ''; // 清空
+      p.classList.add('puzzle-ready');
+
+      parts.forEach((part, i) => {
+        const span = document.createElement('span');
+        span.className = 'piece';
+        span.textContent = part + ' '; // 保留空格
+
+        const { dx, dy } = randomFromSides();
+        const rot = (Math.random() - 0.5) * 18; // -9deg ~ 9deg
+        const delay = i * 55 + Math.random() * 60; // 拼图节奏
+
+        span.style.setProperty('--dx', dx.toFixed(0) + 'px');
+        span.style.setProperty('--dy', dy.toFixed(0) + 'px');
+        span.style.setProperty('--rot', rot.toFixed(1) + 'deg');
+        span.style.setProperty('--delay', delay.toFixed(0) + 'ms');
+
+        p.appendChild(span);
+      });
+    }
+
+    // 1) 先把所有 puzzle 段落构造成碎片
+    const puzzles = document.querySelectorAll('p.puzzle');
+    puzzles.forEach(buildPuzzleParagraph);
+
+    // 2) 滚动到时触发一次拼合
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.25 });
+
+    puzzles.forEach(p => io.observe(p));
+  </script>
+
 </body>
 </html>

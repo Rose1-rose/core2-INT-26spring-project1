@@ -7,50 +7,131 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="text.css" />
+  <title>Puzzle Text</title>
 </head>
+
 <body>
   <header class="bar">
     <a class="back" href="index.html">← Back</a>
   </header>
 
   <main class="page">
-     <p>
-     Captain Liddell Hart reports that a 
-planned offensive by thirteen British divisions, supported by fourteen hundred 
-artillery pieces, against the German line at Serre-Montauban, scheduled for July 24, 
-1916, had to be postponed until the morning of the 29th. He comments that 
-torrential rain caused this delay - which lacked any special significance. The following 
-deposition, dictated by, read over, and then signed by Dr. Yu Tsun, former teacher 
-of English at the Tsingtao Hochschule, casts unsuspected light upon this event. The 
-first two pages are missing. 
-* * * 
- <p>
-     . . . and I hung up the phone. Immediately I recollected the voice that had spoken in 
-German. It was that of Captain Richard Madden. Madden, in Viktor Runeberg's 
-office, meant the end of all our work and - though this seemed a secondary matter, 
-or should have seemed so to me - of our lives also. His being there meant that 
-Runeberg had been arrested or murdered. 1 Before the sun set on this same day, I ran 
-the same risk. Madden was implacable. Rather, to be more accurate, he was obliged 
-to be implacable. An Irishman in the service of England, a man suspected of equivocal 
-feelings if not of actual treachery, how could he fail to welcome and seize upon this 
-extraordinary piece of luck: the discovery, capture and perhaps the deaths of two 
-agents of Imperial Germany? 
-     </p>
-    <p>
-        I went up to my bedroom. Absurd though the gesture was, I closed and locked the 
-door. I threw myself down on my narrow iron bed, and waited on my back. The 
-never changing rooftops filled the window, and the hazy six o'clock sun hung in the 
-sky. It seemed incredible that this day, a day without warnings or omens, might be 
-that of my implacable death. In despite of my dead father, in despite of having been a 
-child in one of the symmetrical gardens of Hai Feng, was I to die now? 
+
+
+    <p class="puzzle">
+      Captain Liddell Hart reports that a planned offensive by thirteen British divisions, supported by fourteen hundred 
+      artillery pieces, against the German line at Serre-Montauban, scheduled for July 24, 1916, had to be postponed until 
+      the morning of the 29th. He comments that torrential rain caused this delay - which lacked any special significance. 
+      The following deposition, dictated by, read over, and then signed by Dr. Yu Tsun, former teacher of English at the 
+      Tsingtao Hochschule, casts unsuspected light upon this event. The first two pages are missing. 
+      * * *
     </p>
-    <p>
-        Then I reflected that all things happen, happen to one, precisely now. Century 
-follows century, and things happen only in the present. There are countless men in 
-the air, on land and at sea, and all that really happens happens to me . . . The almost 
-unbearable memory of Madden's long horseface put an end to these wandering 
-thoughts. 
+
+    <p class="puzzle">
+      . . . and I hung up the phone. Immediately I recollected the voice that had spoken in German. It was that of Captain Richard Madden.
+      Madden, in Viktor Runeberg's office, meant the end of all our work and - though this seemed a secondary matter, or should have seemed so to me -
+      of our lives also. His being there meant that Runeberg had been arrested or murdered. Before the sun set on this same day, I ran the same risk.
+      Madden was implacable. Rather, to be more accurate, he was obliged to be implacable. An Irishman in the service of England, a man suspected of
+      equivocal feelings if not of actual treachery, how could he fail to welcome and seize upon this extraordinary piece of luck: the discovery, capture
+      and perhaps the deaths of two agents of Imperial Germany?
     </p>
-    </main>
+
+    <p class="puzzle">
+      I went up to my bedroom. Absurd though the gesture was, I closed and locked the door. I threw myself down on my narrow iron bed, and waited on my back.
+      The never changing rooftops filled the window, and the hazy six o'clock sun hung in the sky. It seemed incredible that this day, a day without warnings
+      or omens, might be that of my implacable death. In despite of my dead father, in despite of having been a child in one of the symmetrical gardens of Hai Feng,
+      was I to die now?
+    </p>
+
+    <p class="puzzle">
+      Then I reflected that all things happen, happen to one, precisely now. Century follows century, and things happen only in the present. There are countless men
+      in the air, on land and at sea, and all that really happens happens to me . . . The almost unbearable memory of Madden's long horseface put an end to these wandering
+      thoughts.
+    </p>
+
+  </main>
+
+  <!-- JS 放在 body 最底部 -->
+  <script>
+    /**
+     * 把<p class="puzzle">里的纯文本切成“碎片span”
+     * 你可以调 chunkSize 来控制每片的长度（越小越碎，越像拼图）
+     */
+    const chunkSize = 26; // 每片大概多少字符（建议 18-32）
+
+    function splitIntoChunks(text, size) {
+      const clean = text.replace(/\s+/g, ' ').trim();
+      const chunks = [];
+      let i = 0;
+
+      while (i < clean.length) {
+        // 尽量在空格处断开，不要硬切断单词
+        let end = Math.min(i + size, clean.length);
+        if (end < clean.length) {
+          const lastSpace = clean.lastIndexOf(' ', end);
+          if (lastSpace > i + 8) end = lastSpace; // 8 是防止切得太短
+        }
+        chunks.push(clean.slice(i, end));
+        i = end + 1;
+      }
+      return chunks;
+    }
+
+    function randomFromSides() {
+      // 0上 1右 2下 3左
+      const side = Math.floor(Math.random() * 4);
+      const dist = 140 + Math.random() * 220;
+      let dx = 0, dy = 0;
+
+      if (side === 0) { dy = -dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 1) { dx =  dist; dy = (Math.random() - 0.5) * dist; }
+      if (side === 2) { dy =  dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 3) { dx = -dist; dy = (Math.random() - 0.5) * dist; }
+
+      return { dx, dy };
+    }
+
+    function buildPuzzleParagraph(p) {
+      const original = p.textContent;
+      const parts = splitIntoChunks(original, chunkSize);
+
+      p.textContent = ''; // 清空
+      p.classList.add('puzzle-ready');
+
+      parts.forEach((part, i) => {
+        const span = document.createElement('span');
+        span.className = 'piece';
+        span.textContent = part + ' '; // 保留空格
+
+        const { dx, dy } = randomFromSides();
+        const rot = (Math.random() - 0.5) * 18; // -9deg ~ 9deg
+        const delay = i * 55 + Math.random() * 60; // 拼图节奏
+
+        span.style.setProperty('--dx', dx.toFixed(0) + 'px');
+        span.style.setProperty('--dy', dy.toFixed(0) + 'px');
+        span.style.setProperty('--rot', rot.toFixed(1) + 'deg');
+        span.style.setProperty('--delay', delay.toFixed(0) + 'ms');
+
+        p.appendChild(span);
+      });
+    }
+
+    // 1) 先把所有 puzzle 段落构造成碎片
+    const puzzles = document.querySelectorAll('p.puzzle');
+    puzzles.forEach(buildPuzzleParagraph);
+
+    // 2) 滚动到时触发一次拼合
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.25 });
+
+    puzzles.forEach(p => io.observe(p));
+  </script>
+
 </body>
 </html>

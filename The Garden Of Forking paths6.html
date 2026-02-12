@@ -14,7 +14,7 @@
   </header>
 
   <main class="page">
-    <P>
+    <P class="puzzle">
         "Before I discovered this letter, I kept asking myself how a book could be infinite. I 
 could not imagine any other than a cyclic volume, circular. A volume whose last page 
 would be the same as the first and so have the possibility of continuing indefinitely. I 
@@ -25,12 +25,12 @@ night upon which she will relate it, and thus on to infinity. I also imagined a 
 hereditary work, passed on from father to son, to which each individual would add a 
 new chapter or correct, with pious care, the work of his elders.
     </P>
-    <P>
+    <P class="puzzle">
         "These conjectures gave me amusement, but none seemed to have the remotest 
 application to the contradictory chapters of Ts'ui Pen. At this point, I was sent from 
 Oxford the manuscript you have just seen. 
     </P>
-    <P>
+    <P class="puzzle">
         "Naturally, my attention was caught by the sentence, 'I leave to various future times, 
 but not to all, my garden of forking paths: I had no sooner read this, than I 
 understood. The Garden of Forking Paths was the chaotic novel itself. The phrase 'to 
@@ -41,7 +41,7 @@ unfathomable Ts'ui Pen, he chooses - simultaneously - all of them. He thus creat
 various futures, various times which start others that will in their turn branch out 
 and bifurcate in other times. This is the cause of the contradictions in the novel. 
     </P>
-    <P>
+    <P class="puzzle">
         "Fang, let us say, has a secret. A stranger knocks at his door. Fang makes up his mind 
 to kill him. Naturally there are various possible outcomes. Fang can kill the intruder, 
 the intruder can kill Fang, both can be saved, both can die and so on and so on. In 
@@ -50,15 +50,15 @@ departure for other bifurcations. Sometimes the pathways of this labyrinth conve
 For example, you come to this house; but in other possible pasts you are my enemy; 
 in others my friend. 
     </P>
-    <P>
+    <P class="puzzle">
         "If you will put up with my atrocious pronunciation, I would like to read you a few 
 pages of your ancestor's work." 
     </P>
-    <P>
+    <P class="puzzle">
         His countenance, in the bright circle of lamplight, was certainly that of an ancient, but 
 it shone with something unyielding, even immortal. 
     </P>
-    <P>
+    <P class="puzzle">
         With slow precision, he read two versions of the same epic chapter. In the first, an 
 army marches into battle over a desolate mountain pass. The bleak and somber 
 aspect of the rocky landscape made the soldiers feel that life itself was of little value, 
@@ -66,11 +66,95 @@ and so they won the battle easily. In the second, the same army passes through a
 palace where a banquet is in progress. The splendor of the feast remained a memory 
 throughout the glorious battle, and so victory followed. 
     </P>
-    <P>
+    <P class="puzzle">
         With proper veneration I listened to these old tales, although perhaps with less 
 admiration for them in themselves than for the fact that they had been thought out 
 by one of my own blood, and that a man of a distant empire had given them back to 
     </P>
     </main>
+</body>
+</html>
+<!-- JS 放在 body 最底部 -->
+  <script>
+    /**
+     * 把<p class="puzzle">里的纯文本切成“碎片span”
+     * 你可以调 chunkSize 来控制每片的长度（越小越碎，越像拼图）
+     */
+    const chunkSize = 26; // 每片大概多少字符（建议 18-32）
+
+    function splitIntoChunks(text, size) {
+      const clean = text.replace(/\s+/g, ' ').trim();
+      const chunks = [];
+      let i = 0;
+
+      while (i < clean.length) {
+        // 尽量在空格处断开，不要硬切断单词
+        let end = Math.min(i + size, clean.length);
+        if (end < clean.length) {
+          const lastSpace = clean.lastIndexOf(' ', end);
+          if (lastSpace > i + 8) end = lastSpace; // 8 是防止切得太短
+        }
+        chunks.push(clean.slice(i, end));
+        i = end + 1;
+      }
+      return chunks;
+    }
+
+    function randomFromSides() {
+      // 0上 1右 2下 3左
+      const side = Math.floor(Math.random() * 4);
+      const dist = 140 + Math.random() * 220;
+      let dx = 0, dy = 0;
+
+      if (side === 0) { dy = -dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 1) { dx =  dist; dy = (Math.random() - 0.5) * dist; }
+      if (side === 2) { dy =  dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 3) { dx = -dist; dy = (Math.random() - 0.5) * dist; }
+
+      return { dx, dy };
+    }
+
+    function buildPuzzleParagraph(p) {
+      const original = p.textContent;
+      const parts = splitIntoChunks(original, chunkSize);
+
+      p.textContent = ''; // 清空
+      p.classList.add('puzzle-ready');
+
+      parts.forEach((part, i) => {
+        const span = document.createElement('span');
+        span.className = 'piece';
+        span.textContent = part + ' '; // 保留空格
+
+        const { dx, dy } = randomFromSides();
+        const rot = (Math.random() - 0.5) * 18; // -9deg ~ 9deg
+        const delay = i * 55 + Math.random() * 60; // 拼图节奏
+
+        span.style.setProperty('--dx', dx.toFixed(0) + 'px');
+        span.style.setProperty('--dy', dy.toFixed(0) + 'px');
+        span.style.setProperty('--rot', rot.toFixed(1) + 'deg');
+        span.style.setProperty('--delay', delay.toFixed(0) + 'ms');
+
+        p.appendChild(span);
+      });
+    }
+
+    // 1) 先把所有 puzzle 段落构造成碎片
+    const puzzles = document.querySelectorAll('p.puzzle');
+    puzzles.forEach(buildPuzzleParagraph);
+
+    // 2) 滚动到时触发一次拼合
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.25 });
+
+    puzzles.forEach(p => io.observe(p));
+  </script>
+
 </body>
 </html>

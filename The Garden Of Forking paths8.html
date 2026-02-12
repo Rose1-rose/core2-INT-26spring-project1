@@ -14,11 +14,11 @@
   </header>
 
   <main class="page">
-    <P>
+    <P class="puzzle">
         "Not in all," he murmured with a smile. "Time is forever dividing itself toward 
 innumerable futures and in one of them I am your enemy." 
     </P>
-    <P>
+    <P class="puzzle">
         Once again I sensed the pullulation of which I have already spoken. It seemed to me 
 that the dew-damp garden surrounding the house was infinitely saturated with 
 invisible people. All were Albert and myself, secretive, busy and multiform in other 
@@ -26,17 +26,17 @@ dimensions of time. I lifted my eyes and the short nightmare disappeared. In the
 black and yellow garden there was only a single man, but this man was as strong as a 
 statue and this man was walking up the path and he was Captain Richard Madden. 
     </P>
-    <P>
+    <P class="puzzle">
         "The future exists now," I replied. "But I am your friend. Can I take another look at 
 the letter?" 
     </P>
-    <P>
+    <P class="puzzle">
         Albert rose from his seat. He stood up tall as he opened the top drawer of the high 
 writing cabinet. For a moment his back was again turned to me. I had the revolver 
 ready. I fired with the utmost care: Albert fell without a murmur, at once. I swear 
 that his death was instantaneous, as if he had been struck by lightning. 
     </P>
-    <P>
+    <P class="puzzle">
         What remains is unreal and unimportant. Madden broke in and arrested me. I have 
 been condemned to hang. Abominably, I have yet triumphed! The secret name of the 
 city to be attacked got through to Berlin. Yesterday it was bombed. I read the news 
@@ -47,12 +47,96 @@ with my feeble voice, above the tumult of war, the name of the city called Alber
 and that I had no other course open to me than to kill someone of that name. He 
 does not know, for no one can, of my infinite penitence and sickness of the heart. 
     </P>
-    <P>
+    <P class="puzzle">
         ' A malicious and outlandish statement. In point of fact, Captain Richard Madden had been attacked by the 
 Prussian spy Hans Rabener, alias Viktor Runeberg, who drew an automatic pistol when Madden appeared with 
 orders for the spy's arrest. Madden, in self defense, had inflicted wounds of which the spy later died. - Note by 
 the manuscript editor. 
     </P>
      </main>
+</body>
+</html>
+<!-- JS 放在 body 最底部 -->
+  <script>
+    /**
+     * 把<p class="puzzle">里的纯文本切成“碎片span”
+     * 你可以调 chunkSize 来控制每片的长度（越小越碎，越像拼图）
+     */
+    const chunkSize = 26; // 每片大概多少字符（建议 18-32）
+
+    function splitIntoChunks(text, size) {
+      const clean = text.replace(/\s+/g, ' ').trim();
+      const chunks = [];
+      let i = 0;
+
+      while (i < clean.length) {
+        // 尽量在空格处断开，不要硬切断单词
+        let end = Math.min(i + size, clean.length);
+        if (end < clean.length) {
+          const lastSpace = clean.lastIndexOf(' ', end);
+          if (lastSpace > i + 8) end = lastSpace; // 8 是防止切得太短
+        }
+        chunks.push(clean.slice(i, end));
+        i = end + 1;
+      }
+      return chunks;
+    }
+
+    function randomFromSides() {
+      // 0上 1右 2下 3左
+      const side = Math.floor(Math.random() * 4);
+      const dist = 140 + Math.random() * 220;
+      let dx = 0, dy = 0;
+
+      if (side === 0) { dy = -dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 1) { dx =  dist; dy = (Math.random() - 0.5) * dist; }
+      if (side === 2) { dy =  dist; dx = (Math.random() - 0.5) * dist; }
+      if (side === 3) { dx = -dist; dy = (Math.random() - 0.5) * dist; }
+
+      return { dx, dy };
+    }
+
+    function buildPuzzleParagraph(p) {
+      const original = p.textContent;
+      const parts = splitIntoChunks(original, chunkSize);
+
+      p.textContent = ''; // 清空
+      p.classList.add('puzzle-ready');
+
+      parts.forEach((part, i) => {
+        const span = document.createElement('span');
+        span.className = 'piece';
+        span.textContent = part + ' '; // 保留空格
+
+        const { dx, dy } = randomFromSides();
+        const rot = (Math.random() - 0.5) * 18; // -9deg ~ 9deg
+        const delay = i * 55 + Math.random() * 60; // 拼图节奏
+
+        span.style.setProperty('--dx', dx.toFixed(0) + 'px');
+        span.style.setProperty('--dy', dy.toFixed(0) + 'px');
+        span.style.setProperty('--rot', rot.toFixed(1) + 'deg');
+        span.style.setProperty('--delay', delay.toFixed(0) + 'ms');
+
+        p.appendChild(span);
+      });
+    }
+
+    // 1) 先把所有 puzzle 段落构造成碎片
+    const puzzles = document.querySelectorAll('p.puzzle');
+    puzzles.forEach(buildPuzzleParagraph);
+
+    // 2) 滚动到时触发一次拼合
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.25 });
+
+    puzzles.forEach(p => io.observe(p));
+  </script>
+
 </body>
 </html>
