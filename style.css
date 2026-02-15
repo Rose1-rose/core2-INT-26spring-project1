@@ -1,28 +1,21 @@
 :root {
-  /* Color system */
-  --bg-paper: #f2f0e6;        /* White Chocolate */
-  --ink-primary: #0f0f3d;     /* Dark Blue */
-  --ink-secondary: #67637f;   /* Desaturated blue-gray */
-  --accent-orange: #ff6433;  /* Portland Orange */
-  --system-green: #b9d44c;   /* June Bud */
-
+  --bg-paper: #f2f0e6;
+  --ink-primary: #0f0f3d;
+  --ink-secondary: #67637f;
+  --accent-orange: #ff6433;
+  --system-green: #b9d44c;
   --shadow-soft: rgba(0, 0, 0, 0.12);
 }
 
-/* reset */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   min-height: 100vh;
-
   font-family: "IBM Plex Sans", system-ui, sans-serif;
-  background: var(--ink-primary); /* 深蓝作为整体场 */
+  background: var(--ink-primary);
   color: var(--bg-paper);
-
-  overflow: hidden; /* 像一个被限制的系统 */
+  overflow: hidden;
 }
 
 .field {
@@ -30,8 +23,6 @@ body {
   width: 100vw;
   height: 100vh;
 }
-
-
 
 .fragment {
   position: absolute;
@@ -46,28 +37,22 @@ body {
 
   padding: 12px 14px;
   border-radius: 2px;
-
   text-decoration: none;
 
   box-shadow: 0 10px 18px rgba(103, 99, 127, 0.35);
 
   transform: translate(-50%, -50%);
+  will-change: transform, opacity;
 
-  will-change: transform;
+  opacity: 0;      /* fly-in start hidden */
+  z-index: 1;
 }
-
-
-/* ===== Interaction ===== */
-/* Orange appears ONLY on interaction */
 
 .fragment:hover {
   background: var(--accent-orange);
   color: white;
-  animation-play-state: paused;
-
 }
 
 .fragment:active {
   transform: translate(-50%, -50%) scale(0.97);
 }
-
