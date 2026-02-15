@@ -8,32 +8,24 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="text.css" />
 </head>
+
 <body>
   <header class="bar">
     <a class="back" href="index.html">← Back</a>
   </header>
 
   <main class="page">
-   <P class="puzzle">
-The  line  is  made  up  of  an  infinite  number  of 
-points;  the  plane  of  an  infinite  number  of  lines; 
-the  volume  of  an  infinite  number  of  planes;  the 
-hypervolume  of  an  infinite  number  of  volumes. 
-.  .  .  No,  unquestionably  this  is  not — more  geome- 
-trico — the  best  way  of  beginning  my  story.  To 
-claim  that  it  is  true  is  nowadays  the  convention  of 
-every  made-up  story.  Mine,  however,  is  true.
-   </P>
+    <p class="puzzle">
+      The line is made up of an infinite number of points; the plane of an infinite number of lines;
+      the volume of an infinite number of planes; the hypervolume of an infinite number of volumes...
+      No, unquestionably this is not — more geometrico — the best way of beginning my story. To
+      claim that it is true is nowadays the convention of every made-up story. Mine, however, is true.
+    </p>
   </main>
-</body>
-</html>
-<!-- JS 放在 body 最底部 -->
+
+  <!-- JS 放在 body 最底部 -->
   <script>
-    /**
-     * 把<p class="puzzle">里的纯文本切成“碎片span”
-     * 你可以调 chunkSize 来控制每片的长度（越小越碎，越像拼图）
-     */
-    const chunkSize = 26; // 每片大概多少字符（建议 18-32）
+    const chunkSize = 26;
 
     function splitIntoChunks(text, size) {
       const clean = text.replace(/\s+/g, ' ').trim();
@@ -41,11 +33,10 @@ every  made-up  story.  Mine,  however,  is  true.
       let i = 0;
 
       while (i < clean.length) {
-        // 尽量在空格处断开，不要硬切断单词
         let end = Math.min(i + size, clean.length);
         if (end < clean.length) {
           const lastSpace = clean.lastIndexOf(' ', end);
-          if (lastSpace > i + 8) end = lastSpace; // 8 是防止切得太短
+          if (lastSpace > i + 8) end = lastSpace;
         }
         chunks.push(clean.slice(i, end));
         i = end + 1;
@@ -54,7 +45,6 @@ every  made-up  story.  Mine,  however,  is  true.
     }
 
     function randomFromSides() {
-      // 0上 1右 2下 3左
       const side = Math.floor(Math.random() * 4);
       const dist = 140 + Math.random() * 220;
       let dx = 0, dy = 0;
@@ -71,17 +61,17 @@ every  made-up  story.  Mine,  however,  is  true.
       const original = p.textContent;
       const parts = splitIntoChunks(original, chunkSize);
 
-      p.textContent = ''; // 清空
+      p.textContent = '';
       p.classList.add('puzzle-ready');
 
       parts.forEach((part, i) => {
         const span = document.createElement('span');
         span.className = 'piece';
-        span.textContent = part + ' '; // 保留空格
+        span.textContent = part + ' ';
 
         const { dx, dy } = randomFromSides();
-        const rot = (Math.random() - 0.5) * 18; // -9deg ~ 9deg
-        const delay = i * 55 + Math.random() * 60; // 拼图节奏
+        const rot = (Math.random() - 0.5) * 18;
+        const delay = i * 55 + Math.random() * 60;
 
         span.style.setProperty('--dx', dx.toFixed(0) + 'px');
         span.style.setProperty('--dy', dy.toFixed(0) + 'px');
@@ -92,11 +82,9 @@ every  made-up  story.  Mine,  however,  is  true.
       });
     }
 
-    // 1) 先把所有 puzzle 段落构造成碎片
     const puzzles = document.querySelectorAll('p.puzzle');
     puzzles.forEach(buildPuzzleParagraph);
 
-    // 2) 滚动到时触发一次拼合
     const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -108,6 +96,5 @@ every  made-up  story.  Mine,  however,  is  true.
 
     puzzles.forEach(p => io.observe(p));
   </script>
-
 </body>
 </html>

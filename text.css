@@ -1,11 +1,13 @@
 :root{
-  --bg:#a9c83a;              
-  --text:#0b0a4a;            /* 改成深蓝 */
-  --text-dim:rgba(11,10,74,0.65);
-  --accent:#ff6433;          
-  --deep:#0b0a4a;            
-  --line:rgba(11,10,74,0.25);
+  --bg:#0f0f3d;           /* 夜空间 */
+  --deep:#0a0a2a;         /* 导航条 */
+  --text:#f2f0e6;         /* 主文字（纸感） */
+  --text-dim:rgba(242,240,230,0.65);
+  --accent:#ff5a1f;       /* 唯一强调 */
+  --line:rgba(242,240,230,0.15);
 }
+
+
 
 
 *{ box-sizing:border-box; }
@@ -19,14 +21,11 @@ body{
 }
 
 /* ===== top system bar ===== */
-
 .bar{
   position:sticky;
   top:0;
   z-index:10;
-
   padding:14px 18px;
-
   background:var(--deep);
   border-bottom:1px solid rgba(246,240,223,0.3);
 }
@@ -36,7 +35,6 @@ body{
   font-size:12px;
   letter-spacing:.08em;
   text-transform:uppercase;
-
   color:rgba(246,240,223,0.9);
   text-decoration:none;
 }
@@ -47,72 +45,35 @@ body{
   text-underline-offset:4px;
 }
 
-/* ===== page width ===== */
-
-.page{
-  width:min(680px, calc(100vw - 48px));
-  margin:90px auto 120px;
-}
-.page{
-  padding-bottom: 160px;  /* 底部留白，可调 */
-}
-
-.page p{
-  font-family:"IBM Plex Mono", monospace;
-  margin:0 0 20px;
-
-  font-size:16px;
-  line-height:1.95;
-
-  letter-spacing:0.006em;
-  text-align:left;
-
-  color:var(--text);
-}
-
 /* ===== subtle database grid ===== */
-
 body::before{
   content:"";
   position:fixed;
   inset:0;
   pointer-events:none;
-
   background-image:
     linear-gradient(to right, rgba(246,240,223,0.06) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(246,240,223,0.06) 1px, transparent 1px);
-
   background-size:64px 64px;
   opacity:0.4;
 }
 
-/* ===== selection ===== */
-
-::selection{
-  background:var(--accent);
-  color:white;
-}
-
-/* ===== mobile ===== */
-
-@media(max-width:520px){
-  .page{
-    width:min(680px, calc(100vw - 32px));
-    margin:60px auto 90px;
-  }
-
-  .page p{
-    font-size:15px;
-  }
-}
+/* ===== page width ===== */
 .page{
-mask-image: linear-gradient(
-  to bottom,
-  black 60%,
-  rgba(0,0,0,0.7) 90%,
-  rgba(0,0,0,0.5) 100%
-);
+  /* ragging 更舒服：控制每行字符数 */
+  max-width:62ch;
+  margin:0 auto;
+  padding:90px 24px 160px;  /* 顶部/底部留白 */
+}
 
+/* 保留你之前写的“透明渐隐”（原样保留，不动） */
+.page{
+  mask-image: linear-gradient(
+    to bottom,
+    black 60%,
+    rgba(0,0,0,0.7) 90%,
+    rgba(0,0,0,0.5) 100%
+  );
 
   -webkit-mask-image: linear-gradient(
     to bottom,
@@ -122,35 +83,37 @@ mask-image: linear-gradient(
   );
 }
 
-body {
-  margin: 0;
-  font-family: "IBM Plex Mono", monospace;
+.page p{
+  font-family:"IBM Plex Mono", monospace;
+  margin:0 0 22px;
+  font-size:16px;
+  /* ragging/阅读节奏更稳 */
+  line-height:1.7;
+  letter-spacing:0.006em;
+  text-align:left;
+
+  /* 你想更清晰就用 --text；想更淡用 --text-dim */
+  color:var(--text);
+
+  /* 断行更自然 */
+  text-wrap: pretty;
+  hyphens:auto;
 }
 
-.bar {
-  padding: 18px 22px;
+/* ===== selection ===== */
+::selection{
+  background:var(--accent);
+  color:white;
 }
 
-.back {
-  text-decoration: none;
+/* ===== puzzle ===== */
+.puzzle-ready{
+  margin:0 0 22px;
 }
 
-.page {
-  max-width: 740px;
-  margin: 0 auto;
-  padding: 42px 22px 120px;
-  line-height: 1.7;
-}
-
-
-.puzzle-ready {
-  margin: 0 0 22px;
-}
-
-
-.piece {
-  display: inline-block;
-  opacity: 0;
+.piece{
+  display:inline-block;
+  opacity:0;
   transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--rot, 0deg)) scale(0.985);
   filter: blur(7px);
   transition:
@@ -159,26 +122,49 @@ body {
     filter 900ms cubic-bezier(.2,.85,.2,1);
   transition-delay: var(--delay, 0ms);
   will-change: transform, opacity, filter;
+  text-shadow: 0 0 0.01px rgba(0,0,0,0.2);
 }
 
-
-.puzzle.is-visible .piece {
-  opacity: 1;
+/* 关键：永不完全不透明（老师喜欢的点） */
+.puzzle.is-visible .piece{
+  opacity:0.78;
   transform: translate(0, 0) rotate(0deg) scale(1);
   filter: blur(0);
 }
 
-
-.piece {
-  text-shadow: 0 0 0.01px rgba(0,0,0,0.2);
-}
-
-
-@media (prefers-reduced-motion: reduce) {
-  .piece {
-    opacity: 1;
-    transform: none;
-    filter: none;
-    transition: none;
+/* ===== mobile ===== */
+@media(max-width:520px){
+  .page{
+    max-width:92vw;
+    padding:60px 18px 130px;
+  }
+  .page p{
+    font-size:15px;
+    line-height:1.75;
   }
 }
+
+/* ===== reduced motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  .piece{
+    opacity:0.78;
+    transform:none;
+    filter:none;
+    transition:none;
+  }
+}
+
+.page p{
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+/* 最后一行不要被拉伸 */
+.page p::after{
+  content:"";
+  display:inline-block;
+  width:100%;
+}
+
+
+
