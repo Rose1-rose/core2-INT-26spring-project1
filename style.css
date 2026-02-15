@@ -56,3 +56,19 @@ body {
 .fragment:active {
   transform: translate(-50%, -50%) scale(0.97);
 }
+
+.field::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+
+  background-image: url("branches.png.png");
+  background-repeat: no-repeat;
+  background-position: bottom left;
+  background-size: cover;
+  background-position: center;
+
+  opacity: 0.50;   /* 关键参数 */
+}
