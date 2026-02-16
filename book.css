@@ -1,0 +1,44 @@
+/* book.css — The Book of Sand 背景专用（干净版） */
+
+/* 1) 不让 text.css 的 body 背景挡住图片 */
+body{
+  background: transparent !important;
+}
+
+/* 2) 背景图层：最底（注意：不要用 opacity 去改颜色） */
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+
+  background-image: url("images/sand.png"); /* ← 你的路径 */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+/* 3) 深蓝“压一层”：只压亮度，让背景变淡，但不乱改色 */
+body::after{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+
+  background: rgba(15, 15, 61, 0.10);  /* 👈 调这个：越大越淡 */
+}
+
+/* 4) 文字区域在最上 */
+.bar, .page{
+  position: relative;
+  z-index: 2;
+}
+
+/* 5) 如果你还要保留 grid（来自 text.css 的 body::before）
+      但你现在用 book.css 接管了 ::before/::after，
+      所以 grid 需要单独再画一次（可选） */
+body .grid-layer{
+  display:none;
+}
