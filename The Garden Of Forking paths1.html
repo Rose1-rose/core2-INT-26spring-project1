@@ -7,7 +7,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="text.css" />
+  <link rel="stylesheet" href="garden.css" />
   <title>Puzzle Text</title>
+  <style>
+  html{ background:#0f0f3d; }
+  body{ opacity:0; transition: opacity 180ms ease; }
+  body.ready{ opacity:1; }
+</style>
 </head>
 
 <body>
@@ -131,7 +137,13 @@
     }, { threshold: 0.25 });
 
     puzzles.forEach(p => io.observe(p));
-  </script>
+  // 等所有CSS/图片/字体更稳一些再显示
+  window.addEventListener('load', () => {
+    document.body.classList.add('ready');
+  });
+</script>
+
+
 
 </body>
 </html>

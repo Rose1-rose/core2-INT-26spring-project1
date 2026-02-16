@@ -64,7 +64,7 @@ body {
   z-index:0;
   pointer-events:none;
 
-  background-image: url("branches.png.png");
+  background-image: url("index.png");
   background-repeat: no-repeat;
   background-position: bottom left;
   background-size: cover;

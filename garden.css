@@ -1,0 +1,46 @@
+/* garden.css — 覆盖 text.css 的 body::before，把背景图+grid 合在一起 */
+
+/* 让 body 背景不挡图（关键！） */
+body{
+  background: transparent !important;
+}
+
+/* 这一段会覆盖 text.css 里的 body::before（grid） */
+body::before{
+    filter: blur(2px) grayscale(1) contrast(1.28) brightness(0.85);
+    background-blend-mode: multiply;
+
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+
+  /* 先放深蓝遮罩，再放图片（两个背景叠加） */
+  background-image:
+    linear-gradient(rgba(15,15,61,0.25), rgba(15,15,61,0.25)),
+    url("images/garden.png");
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, bottom left;
+  background-size: cover, cover;
+
+  /* 控制整体强度（你这张对比高，建议 0.9-1） */
+  opacity: 1;
+  filter: blur(1px);
+  transform: scale(1.05);
+}
+
+/* 把 grid 单独放到 body::after（否则你会失去 grid） */
+body::after{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+
+  background-image:
+    linear-gradient(to right, rgba(246,240,223,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(246,240,223,0.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: 0.35; /* grid 强度 */
+}
