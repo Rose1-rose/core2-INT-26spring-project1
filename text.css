@@ -1,9 +1,9 @@
 :root{
-  --bg:#0f0f3d;           /* 夜空间 */
-  --deep:#0a0a2a;         /* 导航条 */
-  --text:#f2f0e6;         /* 主文字（纸感） */
+  --bg:#0f0f3d;           
+  --deep:#0a0a2a;        
+  --text:#f2f0e6;         
   --text-dim:rgba(242,240,230,0.65);
-  --accent:#ff5a1f;       /* 唯一强调 */
+  --accent:#ff5a1f;       
   --line:rgba(242,240,230,0.15);
 }
 
@@ -20,7 +20,7 @@ body{
   font-family:"IBM Plex Sans", system-ui, sans-serif;
 }
 
-/* ===== top system bar ===== */
+
 .bar{
   position:sticky;
   top:0;
@@ -45,7 +45,7 @@ body{
   text-underline-offset:4px;
 }
 
-/* ===== subtle database grid ===== */
+
 body::before{
   content:"";
   position:fixed;
@@ -58,15 +58,14 @@ body::before{
   opacity:0.4;
 }
 
-/* ===== page width ===== */
+
 .page{
-  /* ragging 更舒服：控制每行字符数 */
   max-width:62ch;
   margin:0 auto;
-  padding:90px 24px 160px;  /* 顶部/底部留白 */
+  padding:90px 24px 160px;  
 }
 
-/* 保留你之前写的“透明渐隐”（原样保留，不动） */
+
 .page{
   mask-image: linear-gradient(
     to bottom,
@@ -87,26 +86,23 @@ body::before{
   font-family:"IBM Plex Mono", monospace;
   margin:0 0 22px;
   font-size:16px;
-  /* ragging/阅读节奏更稳 */
   line-height:1.7;
   letter-spacing:0.006em;
   text-align:left;
+color:var(--text);
 
-  /* 你想更清晰就用 --text；想更淡用 --text-dim */
-  color:var(--text);
-
-  /* 断行更自然 */
+ 
   text-wrap: pretty;
   hyphens:auto;
 }
 
-/* ===== selection ===== */
+
 ::selection{
   background:var(--accent);
   color:white;
 }
 
-/* ===== puzzle ===== */
+
 .puzzle-ready{
   margin:0 0 22px;
 }
@@ -125,14 +121,14 @@ body::before{
   text-shadow: 0 0 0.01px rgba(0,0,0,0.2);
 }
 
-/* 关键：永不完全不透明（老师喜欢的点） */
+
 .puzzle.is-visible .piece{
   opacity:0.78;
   transform: translate(0, 0) rotate(0deg) scale(1);
   filter: blur(0);
 }
 
-/* ===== mobile ===== */
+
 @media(max-width:520px){
   .page{
     max-width:92vw;
@@ -144,7 +140,6 @@ body::before{
   }
 }
 
-/* ===== reduced motion ===== */
 @media (prefers-reduced-motion: reduce) {
   .piece{
     opacity:0.78;
@@ -159,7 +154,6 @@ body::before{
   text-justify: inter-word;
 }
 
-/* 最后一行不要被拉伸 */
 .page p::after{
   content:"";
   display:inline-block;

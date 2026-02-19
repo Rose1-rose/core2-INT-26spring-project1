@@ -44,7 +44,7 @@ body {
   transform: translate(-50%, -50%);
   will-change: transform, opacity;
 
-  opacity: 0;      /* fly-in start hidden */
+  opacity: 0;     
   z-index: 1;
 }
 
@@ -70,5 +70,5 @@ body {
   background-size: cover;
   background-position: center;
 
-  opacity: 0.50;   /* 关键参数 */
+  opacity: 0.50;   
 }
